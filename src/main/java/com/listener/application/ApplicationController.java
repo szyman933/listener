@@ -50,7 +50,7 @@ import java.util.List;
 
         MqttController mqttController= null;
         try {
-            mqttController = new MqttController(broker,clientId,cleanSession,quietMode,user,password);
+            mqttController = new MqttController(broker,clientId,cleanSession,user,password);
 
             mqttController.publish(topic,qos,payload);
 
