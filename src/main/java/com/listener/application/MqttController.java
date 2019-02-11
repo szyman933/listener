@@ -19,8 +19,14 @@ class MqttController implements MqttCallback {
     private MqttAsyncClient client;
 
     public void messageArrived(String topic, MqttMessage message) throws MqttException {
+
         log.info("Otrzymano wiadomosc z tematu {} o tresci : {}", topic, message.toString());
+        String frame = new String(message.getPayload());
+        FrameParser frameParser = new FrameParser(frame);
+        log.info("Widomosc od modulu {} dla modulu {}, typ wiadomosci {} ", frameParser.getTransmitter(), frameParser.getReceiver(), frameParser.getMessageType());
+
     }
+
 
     public void deliveryComplete(IMqttDeliveryToken token) {
 
@@ -39,8 +45,7 @@ class MqttController implements MqttCallback {
         System.exit(1);
     }
 
-    public MqttController(String brokerUrl, String clientId, boolean cleanSession,
-                          String userName, String password) throws MqttException {
+    public MqttController(String brokerUrl, String clientId, boolean cleanSession, String userName, String password) throws MqttException {
         this.brokerUrl = brokerUrl;
         this.clean = cleanSession;
         this.userName = userName;
@@ -76,7 +81,6 @@ class MqttController implements MqttCallback {
             System.exit(1);
         }
     }
-
 
     public boolean publish(String topicName, int qos, byte[] payload) throws MqttException {
 
