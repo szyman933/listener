@@ -23,11 +23,11 @@ class FrameParser {
         int cursor = 0;
 
         if (msg != null) {
-            this.setTransmitter(Integer.parseInt(msg.substring(cursor, cursor + Protocol.getTRANSMITER())));
-            cursor += Protocol.getTRANSMITER();
-            this.setReceiver(Integer.parseInt(msg.substring(cursor, cursor + Protocol.getRECEIVER())));
-            cursor += Protocol.getRECEIVER();
-            this.setMessageType(Integer.parseInt(msg.substring(cursor, cursor + Protocol.getTYPE())));
+            this.setTransmitter(Integer.parseInt(msg.substring(cursor, cursor + Protocol.getTransmiter())));
+            cursor += Protocol.getTransmiter();
+            this.setReceiver(Integer.parseInt(msg.substring(cursor, cursor + Protocol.getReceiver())));
+            cursor += Protocol.getReceiver();
+            this.setMessageType(Integer.parseInt(msg.substring(cursor, cursor + Protocol.getType())));
         } else {
             throw new IllegalArgumentException("MSG doesnt exist");
         }
@@ -41,7 +41,7 @@ class FrameParser {
     int readCount(String msg) {
 
         if (msg != null && !msg.isEmpty()) {
-            int readLoadLength = msg.length() - Protocol.getHEADER();
+            int readLoadLength = msg.length() - Protocol.getHeader();
             readCount = readLoadLength / (Protocol.getReadInput() + Protocol.getReadRegister() + Protocol.getReadData());
         } else {
             throw new IllegalArgumentException("Message can't be NULL or Empty !!!");
@@ -52,7 +52,7 @@ class FrameParser {
 
 
     void parseReads(String msg) {
-        int cursor = Protocol.getHEADER();
+        int cursor = Protocol.getHeader();
         input = Integer.getInteger(msg.substring(cursor, cursor + Protocol.getReadInput()));
         cursor = cursor + Protocol.getReadInput();
         if (readCount > 0) {
@@ -73,10 +73,10 @@ class FrameParser {
     }
 
     void parseInstallFrame(String msg) {
-        int cursor = Protocol.getHEADER();
+        int cursor = Protocol.getHeader();
 
-        unitType = Integer.parseInt(msg.substring(cursor, cursor + Protocol.getTYPE()));
-        cursor += Protocol.getTYPE();
+        unitType = Integer.parseInt(msg.substring(cursor, cursor + Protocol.getType()));
+        cursor += Protocol.getType();
         inputCount = Integer.parseInt(msg.substring(cursor, cursor + Protocol.getInstallInputCount()));
         cursor += Protocol.getInstallInputCount();
 

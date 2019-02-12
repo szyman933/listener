@@ -35,19 +35,19 @@ public class Protocol {
         return SEVER;
     }
 
-    public static int getHEADER() {
+    public static int getHeader() {
         return HEADER;
     }
 
-    public static int getTRANSMITER() {
+    public static int getTransmiter() {
         return TRANSMITER;
     }
 
-    public static int getRECEIVER() {
+    public static int getReceiver() {
         return RECEIVER;
     }
 
-    public static int getTYPE() {
+    public static int getType() {
         return TYPE;
     }
 
