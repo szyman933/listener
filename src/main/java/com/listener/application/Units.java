@@ -1,10 +1,9 @@
 package com.listener.application;
 
 import lombok.*;
-
 import javax.persistence.*;
-import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Date;
 
 @Entity
 @Table(name = "unit")
@@ -13,7 +12,7 @@ import java.sql.Timestamp;
 @ToString
 @NoArgsConstructor
 @EqualsAndHashCode
-class Units implements Serializable {
+class Units implements Frame {
 
 
     @Id
@@ -28,5 +27,14 @@ class Units implements Serializable {
 
     @Column(name = "reg_date")
     private Timestamp regDate;
+
+    @Override
+    public void parse(String s, int unit) {
+        Date date = new Date();
+        netIdent = unit;
+        unitType = Integer.getInteger(s.substring(Protocol.getHeader(),Protocol.getHeader()+Protocol.getInstallUnitType()));
+        regDate = new Timestamp(date.getTime());
+    }
+
 
 }

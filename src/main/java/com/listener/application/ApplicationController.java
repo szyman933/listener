@@ -38,14 +38,11 @@ public class ApplicationController implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
-
-
-
-
         List<Units> units = unitRepo.findAll();
         for (int i = 0; i < units.size(); i++) {
             log.info("Szczegoly unitu {}: {}", i, units.get(i));
         }
+
 
         MqttController mqttController;
         try {

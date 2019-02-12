@@ -14,9 +14,7 @@ class FrameParser {
     private int input;
     private int inputCount;
     private int[] inputType;
-    private int readCount;
     private int[] registers;
-    private int[] reads;
 
 
     public FrameParser(String msg) {
@@ -36,40 +34,6 @@ class FrameParser {
 
     boolean toProcess() {
         return receiver == Protocol.getSEVER();
-    }
-
-    int readCount(String msg) {
-
-        if (msg != null && !msg.isEmpty()) {
-            int readLoadLength = msg.length() - Protocol.getHeader();
-            readCount = readLoadLength / (Protocol.getReadInput() + Protocol.getReadRegister() + Protocol.getReadData());
-        } else {
-            throw new IllegalArgumentException("Message can't be NULL or Empty !!!");
-        }
-
-        return readCount;
-    }
-
-
-    void parseReads(String msg) {
-        int cursor = Protocol.getHeader();
-        input = Integer.getInteger(msg.substring(cursor, cursor + Protocol.getReadInput()));
-        cursor = cursor + Protocol.getReadInput();
-        if (readCount > 0) {
-
-
-            for (int i = 0; i < readCount; i++) {
-                registers[i] = Integer.getInteger(msg.substring(cursor, cursor + Protocol.getReadRegister()));
-                cursor += Protocol.getReadRegister();
-                reads[i] = Integer.getInteger(msg.substring(cursor, cursor + Protocol.getReadData()));
-                cursor = Protocol.getReadData();
-
-            }
-
-
-        }
-
-
     }
 
     void parseInstallFrame(String msg) {
@@ -130,28 +94,12 @@ class FrameParser {
         this.inputType = inputType;
     }
 
-    public int getReadCount() {
-        return readCount;
-    }
-
-    public void setReadCount(int readCount) {
-        this.readCount = readCount;
-    }
-
     public int[] getRegisters() {
         return registers;
     }
 
     public void setRegisters(int[] registers) {
         this.registers = registers;
-    }
-
-    public int[] getReads() {
-        return reads;
-    }
-
-    public void setReads(int[] reads) {
-        this.reads = reads;
     }
 
     public int getTransmitter() {
