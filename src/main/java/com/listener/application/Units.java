@@ -23,7 +23,7 @@ class Units implements Frame {
     private Integer unitType;
 
     @Column(name = "net_ident")
-    public Integer netIdent;
+    public int netIdent;
 
     @Column(name = "reg_date")
     private Timestamp regDate;

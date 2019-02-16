@@ -11,6 +11,7 @@ import java.io.IOException;
 class MqttController implements MqttCallback {
 
 
+
     private final String brokerUrl;
     private final boolean clean;
     private final String userName;
@@ -18,15 +19,43 @@ class MqttController implements MqttCallback {
     private MqttConnectOptions conOpt;
     private MqttAsyncClient client;
 
-    public void messageArrived(String topic, MqttMessage message) throws MqttException {
+    public void messageArrived(String topic, MqttMessage message) {
 
         log.info("Otrzymano wiadomosc z tematu {} o tresci : {}", topic, message.toString());
+
         String frame = new String(message.getPayload());
-        FrameParser frameParser = new FrameParser(frame);
-        log.info("Widomosc od modulu {} dla modulu {}, typ wiadomosci {} ", frameParser.getTransmitter(), frameParser.getReceiver(), frameParser.getMessageType());
+
+        HeaderParser headerParser = new HeaderParser(frame);
+
+        log.info("Widomosc od modulu {} dla modulu {}, typ wiadomosci {} ", headerParser.getTransmitter(), headerParser.getReceiver(), headerParser.getMessageType());
+
+        int messageType = headerParser.getMessageType();
+        boolean processFlag = headerParser.toProcess();
+
+        if (processFlag) {
+
+            switch (messageType) {
+
+                case 0:
+                    Installation installation = new Installation();
+                    installation.parse(frame, headerParser.getTransmitter());
+                    installation.persist();
+
+                    break;
+
+                case 1:
+                    break;
+
+
+            }
+
+
+        } else {
+            log.info("Message from Unit {} isn't for server", headerParser.getTransmitter());
+        }
+
 
     }
-
 
     public void deliveryComplete(IMqttDeliveryToken token) {
 
@@ -45,7 +74,7 @@ class MqttController implements MqttCallback {
         System.exit(1);
     }
 
-    public MqttController(String brokerUrl, String clientId, boolean cleanSession, String userName, String password) throws MqttException {
+     MqttController(String brokerUrl, String clientId, boolean cleanSession, String userName, String password) throws MqttException {
         this.brokerUrl = brokerUrl;
         this.clean = cleanSession;
         this.userName = userName;
@@ -82,7 +111,7 @@ class MqttController implements MqttCallback {
         }
     }
 
-    public boolean publish(String topicName, int qos, byte[] payload) throws MqttException {
+     boolean publish(String topicName, int qos, byte[] payload) throws MqttException {
 
         // Connect to the MQTT server
         // issue a non-blocking connect and then use the token to wait until the
@@ -118,7 +147,7 @@ class MqttController implements MqttCallback {
         return true;
     }
 
-    public void subscribe(String topicName, int qos) throws MqttException {
+     void subscribe(String topicName, int qos) throws MqttException {
 
         // Connect to the MQTT server
         // issue a non-blocking connect and then use the token to wait until the

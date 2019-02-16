@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Component;
 
 
@@ -12,12 +13,16 @@ import java.util.List;
 
 
 @Slf4j
+@EnableJpaRepositories
 @Component
 public class ApplicationController implements CommandLineRunner {
 
 
     @Autowired
     UnitRepo unitRepo;
+
+    @Autowired
+    UnitTypeRepo unitTypeRepo;
 
     private String broker = "tcp://192.168.1.112:1883";
     private String clientId = "Listener Mqtt";
@@ -30,18 +35,17 @@ public class ApplicationController implements CommandLineRunner {
     private byte[] payload = message.getBytes();
 
 
-    public List<Units> getUnit(int netIdent) {
-
-        return unitRepo.getByUnit(netIdent);
-    }
-
     @Override
     public void run(String... args) {
+
 
         List<Units> units = unitRepo.findAll();
         for (int i = 0; i < units.size(); i++) {
             log.info("Szczegoly unitu {}: {}", i, units.get(i));
         }
+
+        List<UnitType> unitTypes = unitTypeRepo.findAll();
+        log.info("Wszystkie typy {}", unitTypes);
 
 
         MqttController mqttController;

@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @EqualsAndHashCode
 class Readings implements Frame {
-
+/*
     private int readCount;
 
     private List<Integer> reads;
@@ -23,7 +23,7 @@ class Readings implements Frame {
     private int input;
 
     private List<Integer> registers;
-
+*/
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -46,11 +46,11 @@ class Readings implements Frame {
 
     @Override
     public void parse(String s, int unit) {
-        readCount(s);
-        parseReads(s);
+       // readCount(s);
+       // parseReads(s);
         unitId = unit;
     }
-
+/*
 
     void readCount(String msg) {
 
@@ -86,6 +86,6 @@ class Readings implements Frame {
 
 
     }
-
+*/
 
 }
