@@ -5,12 +5,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
 
+
 import java.io.IOException;
 
 @Slf4j
 class MqttController implements MqttCallback {
 
+    private UnitInputRepo unitInputRepo;
 
+    private UnitRepo unitRepo;
+
+    private UnitTypeRepo unitTypeRepo;
 
     private final String brokerUrl;
     private final boolean clean;
@@ -21,38 +26,29 @@ class MqttController implements MqttCallback {
 
     public void messageArrived(String topic, MqttMessage message) {
 
+
         log.info("Otrzymano wiadomosc z tematu {} o tresci : {}", topic, message.toString());
 
         String frame = new String(message.getPayload());
 
         HeaderParser headerParser = new HeaderParser(frame);
 
-        log.info("Widomosc od modulu {} dla modulu {}, typ wiadomosci {} ", headerParser.getTransmitter(), headerParser.getReceiver(), headerParser.getMessageType());
-
-        int messageType = headerParser.getMessageType();
-        boolean processFlag = headerParser.toProcess();
-
-        if (processFlag) {
-
-            switch (messageType) {
-
-                case 0:
-                    Installation installation = new Installation();
-                    installation.parse(frame, headerParser.getTransmitter());
-                    installation.persist();
-
-                    break;
-
-                case 1:
-                    break;
+        switch (headerParser.getMessageType()){
 
 
-            }
+            case 0:
+                Installation installation = new Installation(unitRepo, unitTypeRepo, unitInputRepo);
+
+                installation.parse(frame, headerParser.getTransmitter());
+
+                installation.persist();
+                break;
+
+            case 1: //odczyt
 
 
-        } else {
-            log.info("Message from Unit {} isn't for server", headerParser.getTransmitter());
         }
+
 
 
     }
@@ -74,21 +70,21 @@ class MqttController implements MqttCallback {
         System.exit(1);
     }
 
-     MqttController(String brokerUrl, String clientId, boolean cleanSession, String userName, String password) throws MqttException {
+    MqttController(String brokerUrl, String clientId, boolean cleanSession, String userName, String password, UnitRepo ur, UnitTypeRepo utr, UnitInputRepo uir) {
         this.brokerUrl = brokerUrl;
         this.clean = cleanSession;
         this.userName = userName;
         this.password = password;
-        //This sample stores in a temporary directory... where messages temporarily
-        // stored until the message has been delivered to the server.
-        //..a real application ought to store them somewhere
-        // where they are not likely to get deleted or tampered with
+        this.unitRepo = ur;
+        this.unitTypeRepo = utr;
+        this.unitInputRepo = uir;
+
+
         String tmpDir = System.getProperty("java.io.tmpdir");
         MqttDefaultFilePersistence dataStore = new MqttDefaultFilePersistence(tmpDir);
 
         try {
-            // Construct the connection options object that contains connection parameters
-            // such as cleanSession and LWT
+
             conOpt = new MqttConnectOptions();
             conOpt.setCleanSession(clean);
             if (password != null) {
@@ -111,7 +107,7 @@ class MqttController implements MqttCallback {
         }
     }
 
-     boolean publish(String topicName, int qos, byte[] payload) throws MqttException {
+    boolean publish(String topicName, int qos, byte[] payload) throws MqttException {
 
         // Connect to the MQTT server
         // issue a non-blocking connect and then use the token to wait until the
@@ -147,7 +143,7 @@ class MqttController implements MqttCallback {
         return true;
     }
 
-     void subscribe(String topicName, int qos) throws MqttException {
+    void subscribe(String topicName, int qos) throws MqttException {
 
         // Connect to the MQTT server
         // issue a non-blocking connect and then use the token to wait until the

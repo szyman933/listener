@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 
 import java.util.Date;
-import java.util.List;
 
 
 @Slf4j
@@ -17,10 +16,10 @@ import java.util.List;
 @Component
 public class ApplicationController implements CommandLineRunner {
 
-
+    @Autowired
+    UnitInputRepo unitInputRepo;
     @Autowired
     UnitRepo unitRepo;
-
     @Autowired
     UnitTypeRepo unitTypeRepo;
 
@@ -39,18 +38,10 @@ public class ApplicationController implements CommandLineRunner {
     public void run(String... args) {
 
 
-        List<Units> units = unitRepo.findAll();
-        for (int i = 0; i < units.size(); i++) {
-            log.info("Szczegoly unitu {}: {}", i, units.get(i));
-        }
+        MqttController mqttController = new MqttController(broker, clientId, cleanSession, user, password, unitRepo, unitTypeRepo, unitInputRepo);
 
-        List<UnitType> unitTypes = unitTypeRepo.findAll();
-        log.info("Wszystkie typy {}", unitTypes);
-
-
-        MqttController mqttController;
         try {
-            mqttController = new MqttController(broker, clientId, cleanSession, user, password);
+
 
             mqttController.publish(topic, qos, payload);
 

@@ -1,34 +1,36 @@
 package com.listener.application;
 
 
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
 
-
-@Getter
 @Slf4j
 class Installation implements Frame {
+
 
     private int unitId;
     private int unitType;
     private int inputCount;
     private int[] inputType;
 
-    @Autowired
+
     UnitRepo unitRepo;
 
-    @Autowired
     UnitInputRepo unitInputRepo;
 
-    @Autowired
     UnitTypeRepo unitTypeRepo;
+
+
+    Installation(UnitRepo ur, UnitTypeRepo utr, UnitInputRepo uir) {
+        this.unitRepo = ur;
+        this.unitTypeRepo = utr;
+        this.unitInputRepo = uir;
+
+    }
 
 
     @Override
@@ -56,10 +58,9 @@ class Installation implements Frame {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
 
+        boolean typeFlag = typeValidator(unitType);
 
-            boolean typeFlag = typeValidator(unitType);
-
-            boolean unitFlag = unitValidator(unitId);
+        boolean unitFlag = unitValidator(unitId);
 
 
         if (unitFlag && !typeFlag) {
@@ -68,7 +69,8 @@ class Installation implements Frame {
             unit.setNetIdent(unitId);
             unit.setUnitType(unitType);
             unit.setRegDate(timestamp);
-            log.info("Installing new Unit: {}", unitRepo.saveAndFlush(unit));
+            log.info("Installing new Unit: {}",unitId);
+            unitRepo.save(unit);
 
             List<UnitInput> unitInput = new ArrayList<>();
 
@@ -99,12 +101,10 @@ class Installation implements Frame {
 
     }
 
-    private boolean typeValidator(int type){
+    private boolean typeValidator(int type) {
 
-
-        List<UnitType> unitTypes = unitTypeRepo.findAll();
-        log.info("Wszystkie typy {}",unitTypes);
-            return unitTypes.isEmpty();
+        List<UnitType> unitTypes = unitTypeRepo.getByType(type);
+        return unitTypes.isEmpty();
 
     }
 

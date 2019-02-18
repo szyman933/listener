@@ -3,7 +3,6 @@ package com.listener.application;
 import lombok.*;
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.Date;
 
 @Entity
 @Table(name = "unit")
@@ -12,11 +11,10 @@ import java.util.Date;
 @ToString
 @NoArgsConstructor
 @EqualsAndHashCode
-class Units implements Frame {
-
+class Units {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "unit_type")
@@ -27,14 +25,6 @@ class Units implements Frame {
 
     @Column(name = "reg_date")
     private Timestamp regDate;
-
-    @Override
-    public void parse(String s, int unit) {
-        Date date = new Date();
-        netIdent = unit;
-        unitType = Integer.getInteger(s.substring(Protocol.getHeader(),Protocol.getHeader()+Protocol.getInstallUnitType()));
-        regDate = new Timestamp(date.getTime());
-    }
 
 
 }
