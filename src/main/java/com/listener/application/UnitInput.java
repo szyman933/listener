@@ -13,7 +13,7 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @EqualsAndHashCode
-public class UnitInput implements Serializable {
+class UnitInput implements Serializable {
 
 
     @Id

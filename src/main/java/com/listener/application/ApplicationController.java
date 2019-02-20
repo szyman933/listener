@@ -22,15 +22,12 @@ public class ApplicationController implements CommandLineRunner {
     UnitRepo unitRepo;
     @Autowired
     UnitTypeRepo unitTypeRepo;
+    @Autowired
+    MqttConfig mqttConfig;
 
-    private String broker = "tcp://192.168.1.112:1883";
-    private String clientId = "Listener Mqtt";
-    private boolean cleanSession = true;
-    String user = null;
-    String password = null;
-    String topic = "test";
-    private int qos = 0;
+
     String message = "Testy listenera " + new Date();
+
     private byte[] payload = message.getBytes();
 
 
@@ -38,10 +35,12 @@ public class ApplicationController implements CommandLineRunner {
     public void run(String... args) {
 
 
-        MqttController mqttController = new MqttController(broker, clientId, cleanSession, user, password, unitRepo, unitTypeRepo, unitInputRepo);
+        String topic = mqttConfig.getTopic();
+        int qos = mqttConfig.getQos();
+
+        MqttController mqttController = new MqttController(unitRepo, unitTypeRepo, unitInputRepo, mqttConfig);
 
         try {
-
 
             mqttController.publish(topic, qos, payload);
 

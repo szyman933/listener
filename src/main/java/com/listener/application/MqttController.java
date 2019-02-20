@@ -5,11 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
 
-
 import java.io.IOException;
 
 @Slf4j
 class MqttController implements MqttCallback {
+
 
     private UnitInputRepo unitInputRepo;
 
@@ -17,10 +17,13 @@ class MqttController implements MqttCallback {
 
     private UnitTypeRepo unitTypeRepo;
 
-    private final String brokerUrl;
-    private final boolean clean;
-    private final String userName;
-    private final String password;
+    private String broker;
+
+    private String clientId;
+
+    private boolean clean;
+
+
     private MqttConnectOptions conOpt;
     private MqttAsyncClient client;
 
@@ -33,7 +36,7 @@ class MqttController implements MqttCallback {
 
         HeaderParser headerParser = new HeaderParser(frame);
 
-        switch (headerParser.getMessageType()){
+        switch (headerParser.getMessageType()) {
 
 
             case 0:
@@ -46,10 +49,8 @@ class MqttController implements MqttCallback {
 
             case 1: //odczyt
 
-
+            default:
         }
-
-
 
     }
 
@@ -66,18 +67,20 @@ class MqttController implements MqttCallback {
         // Called when the connection to the server has been lost.
         // An application may choose to implement reconnection
         // logic at this point. This sample simply exits.
-        log.info("Connection to " + brokerUrl + " lost!" + cause);
+        log.info("Connection to " + broker + " lost!" + cause);
         System.exit(1);
     }
 
-    MqttController(String brokerUrl, String clientId, boolean cleanSession, String userName, String password, UnitRepo ur, UnitTypeRepo utr, UnitInputRepo uir) {
-        this.brokerUrl = brokerUrl;
-        this.clean = cleanSession;
-        this.userName = userName;
-        this.password = password;
+
+    MqttController(UnitRepo ur, UnitTypeRepo utr, UnitInputRepo uir, MqttConfig mqttConfig) {
+
+
         this.unitRepo = ur;
         this.unitTypeRepo = utr;
         this.unitInputRepo = uir;
+        this.broker = mqttConfig.getBroker();
+        this.clientId = mqttConfig.getClientid();
+        this.clean = mqttConfig.isCleanSession();
 
 
         String tmpDir = System.getProperty("java.io.tmpdir");
@@ -87,15 +90,9 @@ class MqttController implements MqttCallback {
 
             conOpt = new MqttConnectOptions();
             conOpt.setCleanSession(clean);
-            if (password != null) {
-                conOpt.setPassword(this.password.toCharArray());
-            }
-            if (userName != null) {
-                conOpt.setUserName(this.userName);
-            }
 
             // Construct a non-blocking MQTT client instance
-            client = new MqttAsyncClient(this.brokerUrl, clientId, dataStore);
+            client = new MqttAsyncClient(broker, clientId, dataStore);
 
             // Set this wrapper as the callback handler
             client.setCallback(this);
@@ -113,7 +110,7 @@ class MqttController implements MqttCallback {
         // issue a non-blocking connect and then use the token to wait until the
         // connect completes. An exception is thrown if connect fails.
         String s = new String(payload);
-        log.info("Connecting to " + brokerUrl + " with client ID " + client.getClientId());
+        log.info("Connecting to " + broker + " with client ID " + client.getClientId());
         IMqttToken conToken = client.connect(conOpt, null, null);
         conToken.waitForCompletion();
 
@@ -148,7 +145,7 @@ class MqttController implements MqttCallback {
         // Connect to the MQTT server
         // issue a non-blocking connect and then use the token to wait until the
         // connect completes. An exception is thrown if connect fails.
-        log.info("Connecting to " + brokerUrl + " with client ID " + client.getClientId());
+        log.info("Connecting to " + broker + " with client ID " + client.getClientId());
         IMqttToken conToken = client.connect(conOpt, null, null);
         conToken.waitForCompletion();
         log.info("Connected");
