@@ -17,6 +17,8 @@ class MqttController implements MqttCallback {
 
     private UnitTypeRepo unitTypeRepo;
 
+    private ReadingsRepo readingsRepo;
+
     private String broker;
 
     private String clientId;
@@ -36,22 +38,32 @@ class MqttController implements MqttCallback {
 
         HeaderParser headerParser = new HeaderParser(frame);
 
-        switch (headerParser.getMessageType()) {
+        if (headerParser.toProcess()) {
+
+            switch (headerParser.getMessageType()) {
 
 
-            case 0:
-                Installation installation = new Installation(unitRepo, unitTypeRepo, unitInputRepo);
+                case 0:
+                    Installation installation = new Installation(unitRepo, unitTypeRepo, unitInputRepo);
 
-                installation.parse(frame, headerParser.getTransmitter());
+                    installation.parse(frame, headerParser.getTransmitter());
 
-                installation.persist();
-                break;
+                    installation.persist();
+                    break;
 
-            case 1: //odczyt
+                case 1:
+                    ReadingsHandler readingsHandler = new ReadingsHandler(readingsRepo, unitInputRepo);
 
-            default:
+                    readingsHandler.parse(frame,headerParser.getTransmitter());
+
+                    readingsHandler.persist();
+                    break;
+                default:
+            }
+
+        } else {
+            log.info("Message is for other client, skipping");
         }
-
     }
 
     public void deliveryComplete(IMqttDeliveryToken token) {
@@ -72,12 +84,13 @@ class MqttController implements MqttCallback {
     }
 
 
-    MqttController(UnitRepo ur, UnitTypeRepo utr, UnitInputRepo uir, MqttConfig mqttConfig) {
+    MqttController(UnitRepo ur, UnitTypeRepo utr, UnitInputRepo uir, ReadingsRepo rr, MqttConfig mqttConfig) {
 
 
         this.unitRepo = ur;
         this.unitTypeRepo = utr;
         this.unitInputRepo = uir;
+        this.readingsRepo = rr;
         this.broker = mqttConfig.getBroker();
         this.clientId = mqttConfig.getClientid();
         this.clean = mqttConfig.isCleanSession();

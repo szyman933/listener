@@ -17,16 +17,18 @@ import java.util.Date;
 public class ApplicationController implements CommandLineRunner {
 
     @Autowired
-    UnitInputRepo unitInputRepo;
+    private UnitInputRepo unitInputRepo;
     @Autowired
-    UnitRepo unitRepo;
+    private UnitRepo unitRepo;
     @Autowired
-    UnitTypeRepo unitTypeRepo;
+    private UnitTypeRepo unitTypeRepo;
     @Autowired
-    MqttConfig mqttConfig;
+    private ReadingsRepo readingsRepo;
+    @Autowired
+    private MqttConfig mqttConfig;
 
 
-    String message = "Testy listenera " + new Date();
+    private String message = "Testy listenera " + new Date();
 
     private byte[] payload = message.getBytes();
 
@@ -38,7 +40,7 @@ public class ApplicationController implements CommandLineRunner {
         String topic = mqttConfig.getTopic();
         int qos = mqttConfig.getQos();
 
-        MqttController mqttController = new MqttController(unitRepo, unitTypeRepo, unitInputRepo, mqttConfig);
+        MqttController mqttController = new MqttController(unitRepo, unitTypeRepo, unitInputRepo,readingsRepo, mqttConfig);
 
         try {
 

@@ -1,8 +1,12 @@
 package com.listener.application;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
+@Getter
+@Setter
 @ToString
 @Slf4j
 class HeaderParser {
@@ -31,29 +35,4 @@ class HeaderParser {
         return receiver == Protocol.getSEVER();
     }
 
-
-    public int getReceiver() {
-        return receiver;
-    }
-
-    public void setReceiver(int receiver) {
-        this.receiver = receiver;
-    }
-
-    public int getMessageType() {
-        return messageType;
-    }
-
-    public void setMessageType(int messageType) {
-        this.messageType = messageType;
-    }
-
-
-    public int getTransmitter() {
-        return transmitter;
-    }
-
-    public void setTransmitter(int transmitter) {
-        this.transmitter = transmitter;
-    }
 }
