@@ -11,13 +11,8 @@ import java.io.IOException;
 class MqttController implements MqttCallback {
 
 
-    private UnitInputRepo unitInputRepo;
 
-    private UnitRepo unitRepo;
-
-    private UnitTypeRepo unitTypeRepo;
-
-    private ReadingsRepo readingsRepo;
+    RepoProvider repoProviderMC;
 
     private String broker;
 
@@ -44,7 +39,7 @@ class MqttController implements MqttCallback {
 
 
                 case 0:
-                    Installation installation = new Installation(unitRepo, unitTypeRepo, unitInputRepo);
+                    Installation installation = new Installation(repoProviderMC);
 
                     installation.parse(frame, headerParser.getTransmitter());
 
@@ -52,7 +47,7 @@ class MqttController implements MqttCallback {
                     break;
 
                 case 1:
-                    ReadingsHandler readingsHandler = new ReadingsHandler(readingsRepo, unitInputRepo);
+                    ReadingsHandler readingsHandler = new ReadingsHandler(repoProviderMC);
 
                     readingsHandler.parse(frame,headerParser.getTransmitter());
 
@@ -84,13 +79,16 @@ class MqttController implements MqttCallback {
     }
 
 
-    MqttController(UnitRepo ur, UnitTypeRepo utr, UnitInputRepo uir, ReadingsRepo rr, MqttConfig mqttConfig) {
+    MqttController(RepoProvider repoProvider, MqttConfig mqttConfig) {
 
 
+        /*
         this.unitRepo = ur;
         this.unitTypeRepo = utr;
         this.unitInputRepo = uir;
         this.readingsRepo = rr;
+        */
+        this.repoProviderMC = repoProvider;
         this.broker = mqttConfig.getBroker();
         this.clientId = mqttConfig.getClientid();
         this.clean = mqttConfig.isCleanSession();

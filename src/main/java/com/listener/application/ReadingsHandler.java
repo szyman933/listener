@@ -23,9 +23,9 @@ public class ReadingsHandler implements Frame {
     private int[] read;
 
 
-    ReadingsHandler(ReadingsRepo rr, UnitInputRepo uir) {
-        this.readingsRepo = rr;
-        this.unitInputRepo = uir;
+    ReadingsHandler(RepoProvider repoProvider) {
+        this.readingsRepo = repoProvider.getReadingsRepo();
+        this.unitInputRepo = repoProvider.getUnitInputRepo();
 
     }
 

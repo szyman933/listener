@@ -17,13 +17,8 @@ import java.util.Date;
 public class ApplicationController implements CommandLineRunner {
 
     @Autowired
-    private UnitInputRepo unitInputRepo;
-    @Autowired
-    private UnitRepo unitRepo;
-    @Autowired
-    private UnitTypeRepo unitTypeRepo;
-    @Autowired
-    private ReadingsRepo readingsRepo;
+    RepoProvider repoProvider;
+
     @Autowired
     private MqttConfig mqttConfig;
 
@@ -40,7 +35,7 @@ public class ApplicationController implements CommandLineRunner {
         String topic = mqttConfig.getTopic();
         int qos = mqttConfig.getQos();
 
-        MqttController mqttController = new MqttController(unitRepo, unitTypeRepo, unitInputRepo,readingsRepo, mqttConfig);
+        MqttController mqttController = new MqttController(repoProvider, mqttConfig);
 
         try {
 

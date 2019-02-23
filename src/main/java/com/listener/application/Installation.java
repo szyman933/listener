@@ -25,10 +25,10 @@ class Installation implements Frame {
     UnitTypeRepo unitTypeRepo;
 
 
-    Installation(UnitRepo ur, UnitTypeRepo utr, UnitInputRepo uir) {
-        this.unitRepo = ur;
-        this.unitTypeRepo = utr;
-        this.unitInputRepo = uir;
+    Installation(RepoProvider repoProvider) {
+        this.unitRepo = repoProvider.getUnitRepo();
+        this.unitTypeRepo = repoProvider.getUnitTypeRepo();
+        this.unitInputRepo = repoProvider.unitInputRepo;
 
     }
 
