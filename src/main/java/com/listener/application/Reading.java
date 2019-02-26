@@ -15,7 +15,7 @@ import java.sql.Timestamp;
 @ToString
 @NoArgsConstructor
 @EqualsAndHashCode
-class Readings {
+class Reading {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

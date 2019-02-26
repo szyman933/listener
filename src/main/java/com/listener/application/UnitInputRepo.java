@@ -12,17 +12,17 @@ import java.util.List;
 public interface UnitInputRepo extends JpaRepository<UnitInput, Long> {
 
     @Transactional
-    @Query("SELECT r FROM UnitInput r WHERE r.inputNumber = :input_number")
-    List<UnitInput> getByInput(@Param("input_number") Integer inputNumber);
+    @Query("SELECT r FROM UnitInput r WHERE r.inputNumber = :inputNumber")
+    List<UnitInput> getByInput(@Param("inputNumber") Integer inputNumber);
 
 
     @Transactional
-    @Query("SELECT r FROM UnitInput r WHERE r.unitNetIdent = :unit_net_ident")
-    List<UnitInput> getByUnit(@Param("unit_net_ident") Integer unitNetIdent);
+    @Query("SELECT r FROM UnitInput r WHERE r.unitNetIdent = :unitNetIdent")
+    List<UnitInput> getByUnit(@Param("unitNetIdent") Integer unitNetIdent);
 
     @Transactional
-    @Query("SELECT r FROM UnitInput r WHERE r.unitNetIdent = :unit_net_ident AND r.inputNumber = :input_number")
-    List<UnitInput> getByUnitAndInput(@Param("unit_net_ident") Integer unitNetIdent, @Param("input_number") Integer inputNumber);
+    @Query("SELECT r FROM UnitInput r WHERE r.unitNetIdent = :unitNetIdent AND r.inputNumber = :inputNumber")
+    List<UnitInput> getByUnitAndInput(@Param("unitNetIdent") Integer unitNetIdent, @Param("inputNumber") Integer inputNumber);
 
 
 }

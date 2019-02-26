@@ -8,11 +8,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Repository
-interface ReadingsRepo extends JpaRepository <Readings, Long> {
+interface ReadingsRepo extends JpaRepository <Reading, Long> {
 
     @Transactional
-    @Query("SELECT r FROM Readings r WHERE r.unitId = :unitId")
-    List<Readings> getByUnit(@Param("unitId") Integer unitId);
+    @Query("SELECT r FROM Reading r WHERE r.unitId = :unitId")
+    List<Reading> getByUnit(@Param("unitId") Integer unitId);
 
 
 }

@@ -35,27 +35,32 @@ class Installation implements Frame {
 
     @Override
     public void parse(String msg, int unit) {
-        int cursor = Protocol.getHeader();
+        int cursor = Protocol.HEADER_LENGTH;
         unitId = unit;
-        unitType = Integer.parseInt(msg.substring(cursor, cursor + Protocol.getType()));
-        cursor += Protocol.getType();
-        inputCount = Integer.parseInt(msg.substring(cursor, cursor + Protocol.getInstallInputCount()));
-        cursor += Protocol.getInstallInputCount();
+        unitType = parseIntFromString(msg, cursor, Protocol.TYPE_LENGTH);
+        cursor += Protocol.TYPE_LENGTH;
+        inputCount = parseIntFromString(msg, cursor, Protocol.INSTALL_INPUT_COUNT_LENGTH);
+        cursor += Protocol.INSTALL_INPUT_COUNT_LENGTH;
 
         inputType = new int[inputCount];
 
         for (int i = 0; i < inputCount; i++) {
-            cursor += Protocol.getInstallInputNumber();
-            inputType[i] = Integer.parseInt(msg.substring(cursor, cursor + Protocol.getInstallInputType()));
-            cursor += Protocol.getInstallInputType();
+            cursor += Protocol.INSTALL_INPUT_NUMBER_LENGTH;
+            inputType[i] = parseIntFromString(msg, cursor, Protocol.INSTALL_INPUT_TYPE_LENGTH);
+            cursor += Protocol.INSTALL_INPUT_TYPE_LENGTH;
 
         }
+    }
+
+    private int parseIntFromString(String msg, int cursor, int type) {
+
+        return Integer.parseInt(msg.substring(cursor, cursor + type));
     }
 
 
     void persist() {
 
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
 
 
         boolean typeFlag = typeValidator(unitType);
@@ -65,11 +70,13 @@ class Installation implements Frame {
 
         if (unitFlag && !typeFlag) {
 
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
             Units unit = new Units();
             unit.setNetIdent(unitId);
             unit.setUnitType(unitType);
             unit.setRegDate(timestamp);
-            log.info("Installing new Unit: {}",unitId);
+            log.info("Installing new Unit: {}", unitId);
             unitRepo.save(unit);
 
             List<UnitInput> unitInput = new ArrayList<>();
@@ -81,8 +88,8 @@ class Installation implements Frame {
                 unitInput1.setInputTypeId(inputType[i]);
                 unitInput.add(unitInput1);
             }
-
-            log.info("Installing inputs {}", unitInputRepo.saveAll(unitInput));
+            List<UnitInput> unitInputs = unitInputRepo.saveAll(unitInput);
+            log.info("Installing inputs {}", unitInputs);
 
 
         } else {

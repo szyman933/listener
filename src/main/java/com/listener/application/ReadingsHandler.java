@@ -19,8 +19,7 @@ public class ReadingsHandler implements Frame {
     private int unitId;
     private int readCount;
     private int input;
-    private int[] register;
-    private int[] read;
+    List<RegisterRead> registerReadList;
 
 
     ReadingsHandler(RepoProvider repoProvider) {
@@ -40,8 +39,9 @@ public class ReadingsHandler implements Frame {
     private void readCount(String msg) {
 
         if (msg != null && !msg.isEmpty()) {
-            int readLoadLength = msg.length() - Protocol.getHeader();
-            readCount = readLoadLength / (Protocol.getReadInput() + Protocol.getReadRegister() + Protocol.getReadData());
+
+            readCount = Protocol.readCountInFrame(msg.length());
+
             log.info("There is {} reads in frame", readCount);
         } else {
             throw new IllegalArgumentException("Message can't be NULL or Empty !!!");
@@ -51,26 +51,40 @@ public class ReadingsHandler implements Frame {
 
 
     private void parseReads(String msg) {
-        int cursor = Protocol.getHeader();
-        input = Integer.parseInt(msg.substring(cursor, cursor + Protocol.getReadInput()));
-        cursor = cursor + Protocol.getReadInput();
 
-        register=new int[readCount];
-        read=new int[readCount];
 
         if (readCount > 0) {
+            registerReadList = new ArrayList<>();
+
+            int cursor = Protocol.HEADER_LENGTH;
+            input = parseIntFromString(msg, cursor, Protocol.READ_INPUT_LENGTH);
+            cursor = cursor + Protocol.READ_INPUT_LENGTH;
+
 
             for (int i = 0; i < readCount; i++) {
-                register[i]=(Integer.parseInt(msg.substring(cursor, cursor + Protocol.getReadRegister())));
-                cursor += Protocol.getReadRegister();
-                read[i]=(Integer.parseInt(msg.substring(cursor, cursor + Protocol.getReadData())));
-                cursor = Protocol.getReadData();
+
+                int reg;
+                int rd;
+                reg = (parseIntFromString(msg, cursor, Protocol.READ_REGISTER_LENGTH));
+                cursor += Protocol.READ_REGISTER_LENGTH;
+                rd = (parseIntFromString(msg, cursor, Protocol.READ_DATA_LENGTH));
+                cursor = Protocol.READ_DATA_LENGTH;
+                registerReadList.add(new RegisterRead(reg, rd));
             }
 
         } else {
-            log.info("Readings frame has no reads !!");
+            log.info("Reading frame has no reads !!");
         }
 
+    }
+
+    private int parseIntFromString(String msg, int cursor, int length) {
+        try {
+            return Integer.parseInt(msg.substring(cursor, cursor + length));
+        } catch (NumberFormatException e) {
+            log.error("{}", e);
+        }
+        return -1;
     }
 
 
@@ -78,34 +92,53 @@ public class ReadingsHandler implements Frame {
 
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
-        List<Readings> readings = new ArrayList<>();
+        List<Reading> readings = new ArrayList<>();
+
+        List<UnitInput> unitInputList = unitInputRepo.getByUnitAndInput(unitId, input);
+
+        UnitInput unitInput = unitInputList.get(0);
+
+        int unitInputId = (Math.toIntExact(unitInput.getId()));
+
         if (readCount > 0) {
-            for (int i = 0; i < readCount; i++) {
-                Readings readings1 = new Readings();
+            for (RegisterRead registerRead : registerReadList) {
 
-                readings1.setUnitId(unitId);
+                Reading reading = new Reading();
 
-                readings1.setParamId(register[i]);
+                reading.setUnitId(unitId);
 
-                readings1.setValue(read[i]);
+                reading.setParamId(registerRead.getRegister());
 
-                readings1.setReadDate(timestamp);
+                reading.setValue(registerRead.getRead());
 
-                List<UnitInput> unitInputList = unitInputRepo.getByUnitAndInput(unitId, input);
+                reading.setReadDate(timestamp);
 
-                UnitInput unitInput = unitInputList.get(0);
+                reading.setUnitInputId(unitInputId);
 
-                readings1.setUnitInputId(Math.toIntExact(unitInput.getId()));
-
-                readings.add(readings1);
+                readings.add(reading);
             }
 
-            log.info("Saving read : {}", readingsRepo.saveAll(readings));
+            List<Reading> arg = readingsRepo.saveAll(readings);
+            log.info("Saving read : {}", arg);
 
         } else {
             log.info("Nothing to save !!");
         }
     }
 
+
+    @Getter
+    class RegisterRead {
+        private int register;
+        private int read;
+
+        public RegisterRead() {
+        }
+
+        public RegisterRead(int register, int read) {
+            this.register = register;
+            this.read = read;
+        }
+    }
 
 }

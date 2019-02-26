@@ -20,11 +20,17 @@ class HeaderParser {
         int cursor = 0;
 
         if (msg != null) {
-            this.setTransmitter(Integer.parseInt(msg.substring(cursor, cursor + Protocol.getTransmiter())));
-            cursor += Protocol.getTransmiter();
-            this.setReceiver(Integer.parseInt(msg.substring(cursor, cursor + Protocol.getReceiver())));
-            cursor += Protocol.getReceiver();
-            this.setMessageType(Integer.parseInt(msg.substring(cursor, cursor + Protocol.getType())));
+
+            this.setTransmitter(parseIntFromString(msg, cursor, Protocol.TRANSMITER_LENGTH));
+
+            cursor += Protocol.TRANSMITER_LENGTH;
+
+            this.setReceiver(parseIntFromString(msg, cursor, Protocol.RECEIVER_LENGTH));
+
+            cursor += Protocol.RECEIVER_LENGTH;
+
+            this.setMessageType(parseIntFromString(msg, cursor, Protocol.TYPE_LENGTH));
+
         } else {
             throw new IllegalArgumentException("MSG doesnt exist");
         }
@@ -32,7 +38,16 @@ class HeaderParser {
     }
 
     boolean toProcess() {
-        return receiver == Protocol.getSEVER();
+        return receiver == Protocol.SEVER;
     }
 
+
+    private int parseIntFromString(String msg, int cursor, int length) {
+        try {
+            return Integer.parseInt(msg.substring(cursor, cursor + length));
+        } catch (NumberFormatException e) {
+            log.error("{}", e);
+        }
+        return -1;
+    }
 }

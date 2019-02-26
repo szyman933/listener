@@ -16,7 +16,7 @@ import java.sql.Timestamp;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private Integer id;
 
     @Column(name = "unit_net_ident")
     private Integer unitNetIdent;
@@ -30,8 +30,8 @@ import java.sql.Timestamp;
     @Column(name = "send_date")
     private Timestamp sendDate;
 
-    @Column(name = "unit_input_id")
-    private Integer unitInputId;
+    @Column(name = "unit_input_number")
+    private Integer unitInputNumber;
 
     @Column(name = "value")
     private Integer value;

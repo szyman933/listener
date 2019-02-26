@@ -4,103 +4,39 @@ package com.listener.application;
 public class Protocol {
 
 
-    private static final int SEVER = 0;
-    private static final int HEADER = 6;
-    private static final int TRANSMITER = 2;
-    private static final int RECEIVER = 2;
-    private static final int TYPE = 2;
+    static final int SEVER = 0;
+    static final int HEADER_LENGTH = 6;
+    static final int TRANSMITER_LENGTH = 2;
+    static final int RECEIVER_LENGTH = 2;
+    static final int TYPE_LENGTH = 2;
 
-    private static final int READ_INPUT = 2;
-    private static final int READ_REGISTER = 4;
-    private static final int READ_DATA = 5;
+    static final int READ_INPUT_LENGTH = 2;
+    static final int READ_REGISTER_LENGTH = 4;
+    static final int READ_DATA_LENGTH = 5;
 
-    private static final int INSTALL_UNIT_TYPE = 2;
-    private static final int INSTALL_INPUT_COUNT = 2;
-    private static final int INSTALL_INPUT_NUMBER = 2;
-    private static final int INSTALL_INPUT_TYPE = 2;
+    static final int INSTALL_UNIT_TYPE_LENGTH = 2;
+    static final int INSTALL_INPUT_COUNT_LENGTH = 2;
+    static final int INSTALL_INPUT_NUMBER_LENGTH = 2;
+    static final int INSTALL_INPUT_TYPE_LENGTH = 2;
 
-    private static final int REQUEST_INPUT = 2;
-    private static final int REQUEST_REGISTER = 4;
-    private static final int REQUEST_DATA = 5;
+    static final int REQUEST_INPUT_LENGTH = 2;
+    static final int REQUEST_REGISTER_LENGTH = 4;
+    static final int REQUEST_DATA_LENGTH = 5;
 
-    private static final int ACTIVE_PARAM_INPUT = 2;
-    private static final int ACTIVE_PARAM_REGISTER_COUNT = 3;
-    private static final int ACTIVE_PARAM_REGISTER = 3;
+    static final int ACTIVE_PARAM_INPUT_LENGTH = 2;
+    static final int ACTIVE_PARAM_REGISTER_COUNT_LENGTH = 3;
+    static final int ACTIVE_PARAM_REGISTER_LENGTH = 3;
 
 
     Protocol() {
     }
 
-    public static int getSEVER() {
-        return SEVER;
-    }
 
-    public static int getHeader() {
-        return HEADER;
-    }
+    public static int readCountInFrame(int length){
 
-    public static int getTransmiter() {
-        return TRANSMITER;
-    }
+        int readLoadLength = length - HEADER_LENGTH;
+        return readLoadLength / (READ_INPUT_LENGTH + READ_REGISTER_LENGTH + READ_DATA_LENGTH);
 
-    public static int getReceiver() {
-        return RECEIVER;
-    }
-
-    public static int getType() {
-        return TYPE;
-    }
-
-    public static int getReadInput() {
-        return READ_INPUT;
-    }
-
-    public static int getReadRegister() {
-        return READ_REGISTER;
-    }
-
-    public static int getReadData() {
-        return READ_DATA;
-    }
-
-    public static int getInstallUnitType() {
-        return INSTALL_UNIT_TYPE;
-    }
-
-    public static int getInstallInputCount() {
-        return INSTALL_INPUT_COUNT;
-    }
-
-    public static int getInstallInputNumber() {
-        return INSTALL_INPUT_NUMBER;
-    }
-
-    public static int getInstallInputType() {
-        return INSTALL_INPUT_TYPE;
-    }
-
-    public static int getRequestInput() {
-        return REQUEST_INPUT;
-    }
-
-    public static int getRequestRegister() {
-        return REQUEST_REGISTER;
-    }
-
-    public static int getRequestData() {
-        return REQUEST_DATA;
-    }
-
-    public static int getActiveParamInput() {
-        return ACTIVE_PARAM_INPUT;
-    }
-
-    public static int getActiveParamRegisterCount() {
-        return ACTIVE_PARAM_REGISTER_COUNT;
-    }
-
-    public static int getActiveParamRegister() {
-        return ACTIVE_PARAM_REGISTER;
     }
 
 }
