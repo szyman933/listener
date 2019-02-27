@@ -16,10 +16,12 @@ public class ReadingsHandler implements Frame {
 
     UnitInputRepo unitInputRepo;
 
+    List<RegisterRead> registerReadList;
+
     private int unitId;
     private int readCount;
     private int input;
-    List<RegisterRead> registerReadList;
+
 
 
     ReadingsHandler(RepoProvider repoProvider) {
@@ -57,7 +59,9 @@ public class ReadingsHandler implements Frame {
             registerReadList = new ArrayList<>();
 
             int cursor = Protocol.HEADER_LENGTH;
+
             input = parseIntFromString(msg, cursor, Protocol.READ_INPUT_LENGTH);
+
             cursor = cursor + Protocol.READ_INPUT_LENGTH;
 
 
@@ -65,10 +69,15 @@ public class ReadingsHandler implements Frame {
 
                 int reg;
                 int rd;
+
                 reg = (parseIntFromString(msg, cursor, Protocol.READ_REGISTER_LENGTH));
+
                 cursor += Protocol.READ_REGISTER_LENGTH;
+
                 rd = (parseIntFromString(msg, cursor, Protocol.READ_DATA_LENGTH));
+
                 cursor = Protocol.READ_DATA_LENGTH;
+
                 registerReadList.add(new RegisterRead(reg, rd));
             }
 

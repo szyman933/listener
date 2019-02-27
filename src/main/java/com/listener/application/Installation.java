@@ -72,7 +72,7 @@ class Installation implements Frame {
 
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
-            Units unit = new Units();
+            Unit unit = new Unit();
             unit.setNetIdent(unitId);
             unit.setUnitType(unitType);
             unit.setRegDate(timestamp);
@@ -118,7 +118,7 @@ class Installation implements Frame {
 
     private boolean unitValidator(int unit) {
 
-        List<Units> units = unitRepo.getByUnit(unit);
+        List<Unit> units = unitRepo.getByUnit(unit);
         return units.isEmpty();
 
     }

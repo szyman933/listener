@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 @ToString
 @NoArgsConstructor
 @EqualsAndHashCode
-class Units {
+class Unit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

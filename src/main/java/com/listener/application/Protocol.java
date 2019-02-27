@@ -23,9 +23,26 @@ public class Protocol {
     static final int REQUEST_REGISTER_LENGTH = 4;
     static final int REQUEST_DATA_LENGTH = 5;
 
-    static final int ACTIVE_PARAM_INPUT_LENGTH = 2;
+    static final int SCHEDULE_INTERVAL_LENGTH = 4;
+
+    static final int PLC_SAVE_VALUE_LENGTH = 4;
+
     static final int ACTIVE_PARAM_REGISTER_COUNT_LENGTH = 3;
     static final int ACTIVE_PARAM_REGISTER_LENGTH = 3;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     Protocol() {

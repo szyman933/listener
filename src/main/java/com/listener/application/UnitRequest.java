@@ -36,6 +36,8 @@ import java.sql.Timestamp;
     @Column(name = "value")
     private Integer value;
 
+   @Column(name = "register")
+   private Integer register;
 
 
 }
