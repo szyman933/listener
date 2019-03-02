@@ -22,26 +22,23 @@ public class ApplicationController implements CommandLineRunner {
     @Autowired
     private MqttConfig mqttConfig;
 
-
     private String message = "Testy listenera " + new Date();
 
-    private byte[] payload = message.getBytes();
+
 
 
     @Override
     public void run(String... args) {
 
 
-        String topic = mqttConfig.getTopic();
-        int qos = mqttConfig.getQos();
-
         MqttController mqttController = new MqttController(repoProvider, mqttConfig);
+
 
         try {
 
-            mqttController.publish(topic, qos, payload);
+            mqttController.publish(message);
 
-            mqttController.subscribe(topic, qos);
+            mqttController.subscribe();
 
         } catch (MqttException e) {
             log.error(e.toString());

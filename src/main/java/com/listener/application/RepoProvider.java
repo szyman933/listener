@@ -21,5 +21,8 @@ public class RepoProvider {
 
     @Autowired
     UnitRequestRepo unitRequestRepo;
+
+    @Autowired
+    ParamsMapRepo paramsMapRepo;
     
 }

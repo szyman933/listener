@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.sql.Date;
-import java.util.List;
+
 
 @Slf4j
 @Component
@@ -20,13 +20,13 @@ public class ScheduledTasks {
     ParamsMapRepo paramsMapRepo;
 
 
-
     @Scheduled(fixedRate = 5000)
     public void reportCurrentTime() {
         log.info("The time is now {}", new Date(System.currentTimeMillis()));
 
-        requestHandler.checkRequest();
-
+        if (requestHandler.checkRequest()) {
+            requestHandler.sendRequest();
+        }
 
 
     }

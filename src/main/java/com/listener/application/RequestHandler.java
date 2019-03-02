@@ -2,27 +2,29 @@ package com.listener.application;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.paho.client.mqttv3.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
+import java.sql.Timestamp;
 import java.util.List;
 
 @Slf4j
 @Component
 class RequestHandler {
 
-    @Autowired
-    UnitRequestRepo unitRequestRepo;
 
     @Autowired
-    ParamsMapRepo paramsMapRepo;
+    RepoProvider repoProvider;
+
+    @Autowired
+    private MqttConfig mqttConfigPublisher;
 
     private List<UnitRequest> unitRequests;
 
     boolean checkRequest() {
         boolean flag = false;
 
-        unitRequests = unitRequestRepo.findBySendDateIsNull();
+        unitRequests = repoProvider.unitRequestRepo.findBySendDateIsNull();
 
         if (unitRequests.isEmpty()) {
 
@@ -40,6 +42,29 @@ class RequestHandler {
 
     void sendRequest() {
 
+        mqttConfigPublisher.setClientid("Publisher");
+
+        MqttController mqttControllerPublisher = new MqttController(repoProvider, mqttConfigPublisher);
+
+        for (UnitRequest request : unitRequests) {
+            boolean send = false;
+            String message = requestBuilder(request);
+
+            try {
+                send = mqttControllerPublisher.publish(message);
+            } catch (MqttException e) {
+                log.error(e.toString());
+            }
+
+
+            if (send) {
+                request.setSendDate(new Timestamp(System.currentTimeMillis()));
+                repoProvider.unitRequestRepo.save(request);
+                repoProvider.unitRequestRepo.flush();
+
+            }
+
+        }
 
     }
 
@@ -100,15 +125,16 @@ class RequestHandler {
                 break;
 
             case 6:
-                List<ParamsMap> paramsMap = paramsMapRepo.getByActiveAndRead();
-
+                List<ParamsMap> paramsMap = repoProvider.paramsMapRepo.getByActiveAndRead();
                 sB.append(String.format(transmiterFormat, Protocol.SEVER));
                 sB.append(String.format(receiverFormat, unitRequest.getUnitNetIdent()));
                 sB.append(String.format(typeFormat, unitRequest.getRequestType()));
                 sB.append(String.format(inputFormat, unitRequest.getUnitInputNumber()));
-                //TODO dokończyć skłądanie requesta z aktywnymi parametrami
-
-
+                sB.append(String.format(plcActiveRegisterCountFormat, paramsMap.size()));
+                for (ParamsMap map : paramsMap) {
+                    sB.append(String.format(plcActiveRegisterFormat, map.getIndex()));
+                }
+                message = sB.toString();
                 break;
 
             default:
@@ -118,10 +144,7 @@ class RequestHandler {
                 sB.append(String.format(inputFormat, unitRequest.getUnitInputNumber()));
                 message = sB.toString();
                 break;
-
-
         }
-
 
         return message;
     }

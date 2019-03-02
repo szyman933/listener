@@ -11,12 +11,15 @@ import java.io.IOException;
 class MqttController implements MqttCallback {
 
 
-
     RepoProvider repoProviderMC;
 
     private String broker;
 
     private String clientId;
+
+    private String topicName;
+
+    private int qos;
 
     private boolean clean;
 
@@ -49,7 +52,7 @@ class MqttController implements MqttCallback {
                 case 1:
                     ReadingsHandler readingsHandler = new ReadingsHandler(repoProviderMC);
 
-                    readingsHandler.parse(frame,headerParser.getTransmitter());
+                    readingsHandler.parse(frame, headerParser.getTransmitter());
 
                     readingsHandler.persist();
                     break;
@@ -82,16 +85,12 @@ class MqttController implements MqttCallback {
     MqttController(RepoProvider repoProvider, MqttConfig mqttConfig) {
 
 
-        /*
-        this.unitRepo = ur;
-        this.unitTypeRepo = utr;
-        this.unitInputRepo = uir;
-        this.readingsRepo = rr;
-        */
         this.repoProviderMC = repoProvider;
         this.broker = mqttConfig.getBroker();
         this.clientId = mqttConfig.getClientid();
         this.clean = mqttConfig.isCleanSession();
+        this.topicName = mqttConfig.getTopic();
+        this.qos = mqttConfig.getQos();
 
 
         String tmpDir = System.getProperty("java.io.tmpdir");
@@ -115,12 +114,13 @@ class MqttController implements MqttCallback {
         }
     }
 
-    boolean publish(String topicName, int qos, byte[] payload) throws MqttException {
+    boolean publish(String messageToSent) throws MqttException {
 
         // Connect to the MQTT server
         // issue a non-blocking connect and then use the token to wait until the
         // connect completes. An exception is thrown if connect fails.
-        String s = new String(payload);
+
+        byte[] payload = messageToSent.getBytes();
         log.info("Connecting to " + broker + " with client ID " + client.getClientId());
         IMqttToken conToken = client.connect(conOpt, null, null);
         conToken.waitForCompletion();
@@ -128,7 +128,7 @@ class MqttController implements MqttCallback {
         log.info("Connected");
 
 
-        log.info("Publishing  to topic {} fallowing message : {}", topicName, s);
+        log.info("Publishing  to topic {} fallowing message : {}", topicName, messageToSent);
 
         // Construct the message to send
         MqttMessage message = new MqttMessage(payload);
@@ -151,7 +151,7 @@ class MqttController implements MqttCallback {
         return true;
     }
 
-    void subscribe(String topicName, int qos) throws MqttException {
+    void subscribe() throws MqttException {
 
         // Connect to the MQTT server
         // issue a non-blocking connect and then use the token to wait until the
